@@ -2,15 +2,19 @@ package com.rbp.projects.extractwalmartpdf.controller;
 
 import com.rbp.projects.extractwalmartpdf.model.Invoice;
 import com.rbp.projects.extractwalmartpdf.model.Item;
+import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.pdf.PDFParser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,47 +24,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @RestController
 public class TikaController {
+    @PostMapping("/upload")
+    public Invoice uploadFile(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Please select a file to upload.");
+        }
 
-    @GetMapping("/invoice")
-    public Invoice getInvoice() {
-        List<String> lines = readWalmartPdf();
-        Invoice inv = createInvoice(lines);
-//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "MMM-dd-yyyy" ) ;
-//        List<Item> list = inv.getItemList();
-//
-//        System.out.println("Order Number: " + inv.getOrderNumber());
-//        System.out.println("Date: "+ simpleDateFormat.format(inv.getDate()));
-//
-//        System.out.printf("%-8s %-123s %-25s %-8s %-8s%n", "Item No.", "Name", "Status", "Quantity", "Amount");
-//        int count = 1;
-//        for(Item i : list){
-//            String name = i.getName();
-//            String status = i.getStatus();
-//            int quantity = i.getQty();
-//            double amount = i.getAmount();
-//            System.out.printf("%-8d %-123s %-25s %-8d %-6.2f%n",count , name, status, quantity, amount);
-//            count++;
-//        }
-//
-//        System.out.println("SubTotal: " + inv.getSubTotal());
-//        System.out.println("Savings: " + inv.getSavings());
-//        System.out.println("Tax: " + inv.getTax());
-//        System.out.println("Bag Fee: " + inv.getBagFee());
-//        System.out.println("Driver Tip: " + inv.getDriverTip());
-//        System.out.println("Donation: " + inv.getDonation());
-//        System.out.println("Grand Total: " + inv.getTotal());
-//        System.out.println("Card Ending In: " + inv.getCardEndingIn());
+        try {
+            // Process the uploaded PDF file
+            List<String> lines = readPdf(file);
 
-        return inv;
+            // Create the Invoice object
+            Invoice invoice = createInvoice(lines);
+
+            return invoice;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to upload file.", e);
+        }
     }
 
-
-    public static List<String> readWalmartPdf() {
+    private List<String> readPdf(MultipartFile file) throws IOException, SAXException, TikaException {
         List<String> lines = new ArrayList<>();
         BodyContentHandler contentHandler = new BodyContentHandler();
-        try {
-            File file = new File("C:/Projects/Test/sampleWalmart7.pdf");
-            FileInputStream fileInputStream = new FileInputStream(file);
+
+        // Read PDF file content
+        try (InputStream fileInputStream = file.getInputStream()) {
             Metadata metadata = new Metadata();
             ParseContext context = new ParseContext();
             PDFParser pdfParser = new PDFParser();
@@ -71,11 +59,11 @@ public class TikaController {
                     lines.add(line);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
         return lines;
     }
+
     public static Invoice createInvoice(List<String> strings) {
         Invoice invoice = new Invoice();
         try{
@@ -239,15 +227,12 @@ public class TikaController {
     }
 
     public static String getStatusFromString(String str) {
-        // Regular expression pattern to match the status
         Pattern pattern = Pattern.compile("(Unavailable|Shopped|Weight-adjusted|You’re all set! No need to return this item)");
         Matcher matcher = pattern.matcher(str);
 
-        // If a match is found, return the status
         if (matcher.find()) {
             return matcher.group(1);
         } else {
-            // If no match is found, handle as appropriate (return null, throw an exception, etc.)
             return "";
         }
     }

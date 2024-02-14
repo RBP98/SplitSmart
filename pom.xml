@@ -13,7 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>extract-walmart-pdf</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Project for extracting data from Walmart PDF Receipt</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -23,6 +23,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.11.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
