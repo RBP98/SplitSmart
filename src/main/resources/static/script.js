@@ -1,3 +1,46 @@
+function chooseFile() {
+    document.getElementById("fileInput").click();
+}
+
+document.getElementById("fileInput").addEventListener("change", function() {
+    var file = this.files[0];
+    if (file) {
+        document.getElementById("fileName").innerText = "Selected file: " + file.name;
+    } else {
+        document.getElementById("fileName").innerText = "";
+    }
+});
+function downloadSpreadsheet() {
+    fetch("/downloadInvoice", {
+        method: "POST",
+        // body: formData
+    })
+        .then(response => response.blob())
+        .then(blob => {
+            // Create a blob URL for the downloaded file
+            const url = window.URL.createObjectURL(blob);
+
+            // Create a link element
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = "abcd.xlsx";
+
+            // Add the link to the document body
+            document.body.appendChild(a);
+
+            // Simulate a click on the link to trigger the download
+            a.click();
+
+            // Cleanup
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
 document.getElementById("submitForm").addEventListener("submit", function(event) {
     event.preventDefault();
     var file = document.getElementById("fileInput").files[0];
@@ -20,7 +63,6 @@ document.getElementById("submitForm").addEventListener("submit", function(event)
         alert("Please select a file before submitting.");
     }
 });
-
 function renderInvoice(orderInfo) {
     const orderTable = document.getElementById("order-info");
     orderTable.innerHTML = `

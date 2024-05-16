@@ -1,22 +1,22 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-    background-color: #470e37; /* Light gray background */
+    background-color: #470e37;
     margin: 0;
     padding: 0;
 }
 
 h1 {
-    color: #ffafaf; /* Dark gray heading */
+    color: #ffafaf;
 }
 
 p {
-    color: #ffcaca; /* Medium gray text */
+    color: #ffcaca;
 }
 
 input[type="file"],
 button {
-    background-color: #7c305f; /* Blue button */
+    background-color: #7c305f;
     border: none;
     color: #ffcaca;
     padding: 10px 20px;
@@ -32,12 +32,12 @@ button {
 
 input[type="file"]:hover,
 button:hover {
-    background-color: #8a1c65; /* Darker blue on hover */
+    background-color: #8a1c65;
 }
 
 #fileName {
     margin-top: 20px;
-    color: #ffcaca; /* Dark gray text */
+    color: #ffcaca;
 }
 
 #submitForm {

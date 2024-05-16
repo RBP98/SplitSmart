@@ -10,85 +10,24 @@
 <body>
 <h1>Welcome to your very own Walmart Calculator!!</h1>
 <p>Please upload your Walmart PDF receipt:</p>
-<input type="file" id="fileInput" accept=".pdf">
-<div id="fileName"></div>
+<div>
+    <input type="file" id="fileInput" accept=".pdf">
+    <!--<button onclick="chooseFile()">Upload PDF</button>-->
+    <!--<button type="submit">Submit</button>-->
+    <div id="fileName"></div>
 
-<form id="submitForm" style="margin-top: 20px;">
-    <button type="submit">Submit</button>
-</form>
+    <form id="submitForm" style="margin-top: 20px;">
+        <button type="submit">Submit</button>
+    </form>
+
+    <button onclick="downloadSpreadsheet()" id = "downloadInvoice">Download Spreadsheet</button>
+
+</div>
 
 <div id="order-info"></div>
 
-<script>
-
-    document.getElementById("submitForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        var file = document.getElementById("fileInput").files[0];
-        if (file) {
-            var formData = new FormData();
-            formData.append("file", file);
-
-            fetch("http://localhost:8080/upload", {
-                method: "POST",
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    renderInvoice(data);
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                });
-        } else {
-            alert("Please select a file before submitting.");
-        }
-    });
-
-    function renderInvoice(orderInfo) {
-        const orderTable = document.getElementById("order-info");
-        orderTable.innerHTML = `
-            <p><strong>Order Number:</strong> ${orderInfo.orderNumber}</p>
-            <p><strong>Date:</strong> ${new Date(orderInfo.date).toLocaleDateString()}</p>
-            <table>
-                <tr>
-                    <th>Item</th>
-                    <th>Amount</th>
-                    <th>Qty</th>
-                    <th>Status</th>
-                </tr>
-                ${orderInfo.itemList.map(item => `
-                    <tr>
-                        <td class="item-name">${item.name}</td>
-                        <td>$${item.amount.toFixed(2)}</td>
-                        <td>${item.qty}</td>
-                        <td>${item.status}</td>
-                    </tr>
-                `).join('')}
-                <tr class="total-row">
-                    <td colspan="4"><strong>Subtotal:</strong> $${orderInfo.subTotal.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4"><strong>Savings:</strong> $${orderInfo.savings.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4"><strong>Bag Fee:</strong> $${orderInfo.bagFee.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4"><strong>Tax:</strong> $${orderInfo.tax.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4"><strong>Driver Tip:</strong> $${orderInfo.driverTip.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4"><strong>Donation:</strong> $${orderInfo.donation.toFixed(2)}</td>
-                </tr>
-                <tr class="total-row">
-                    <td colspan="4"><strong>Total:</strong> $${orderInfo.total.toFixed(2)}</td>
-                </tr>
-            </table>
-            <p><strong>Card Ending In:</strong> ${orderInfo.cardEndingIn}</p>
-        `;
-    }
-</script>
+<div>
+    <button onClick="splitWithAll()">Split with All</button>
+</div>
 </body>
 </html>

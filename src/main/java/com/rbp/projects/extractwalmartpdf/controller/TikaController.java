@@ -24,6 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 @RestController
 public class TikaController {
+    static Invoice invoice;
+    static int numberOfItems;
+
+    static String orderNumber;
     @PostMapping("/upload")
     public Invoice uploadFile(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -35,7 +39,7 @@ public class TikaController {
             List<String> lines = readPdf(file);
 
             // Create the Invoice object
-            Invoice invoice = createInvoice(lines);
+            invoice = createInvoice(lines);
 
             return invoice;
         } catch (Exception e) {
@@ -60,7 +64,6 @@ public class TikaController {
                 }
             }
         }
-
         return lines;
     }
 
@@ -76,6 +79,7 @@ public class TikaController {
                     invoice.setDateIndex(index);
                 }else if(isOrderNumber(s) && invoice.getOrderNumber()== null){
                     invoice.setOrderNumber(s.substring(7));
+                    orderNumber = invoice.getOrderNumber();
                 }else if(isSubTotal(s) && invoice.getSubTotal()==0.0){
                     invoice.setSubTotal(getAmountFromString(s));
                 }else if(isSavings(s) && invoice.getSavings() == 0.0){
@@ -100,6 +104,7 @@ public class TikaController {
             List<Item> itemList = createItemList(rawItemList);
 
             invoice.setItemList(itemList);
+            numberOfItems = itemList.size();
 
 //            int count = 0;
 //        for (RowsInInvoice row : rowsList) {
@@ -227,7 +232,7 @@ public class TikaController {
     }
 
     public static String getStatusFromString(String str) {
-        Pattern pattern = Pattern.compile("(Unavailable|Shopped|Weight-adjusted|You’re all set! No need to return this item)");
+        Pattern pattern = Pattern.compile("(Unavailable|Shopped|Weight-adjusted|You’re all set! No need to return this item|Return complete)");
         Matcher matcher = pattern.matcher(str);
 
         if (matcher.find()) {
@@ -249,7 +254,7 @@ public class TikaController {
     }
 
     public static String getItemNameFromString(String s){
-        Pattern pattern = Pattern.compile("^(.*)(Unavailable|Shopped|Weight-adjusted|You’re all set! No need to return this item)");
+        Pattern pattern = Pattern.compile("^(.*)(Unavailable|Shopped|Weight-adjusted|You’re all set! No need to return this item|Return Complete)");
         Matcher matcher = pattern.matcher(s);
         if(matcher.find()){
             return matcher.group(1).trim();
