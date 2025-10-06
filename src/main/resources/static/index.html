@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Walmart PDF</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+<h1>Welcome to your very own Walmart Calculator!!</h1>
+<p>Please upload your Walmart PDF receipt:</p>
+<div>
+    <input type="file" id="fileInput" accept=".pdf">
+    <!--<button onclick="chooseFile()">Upload PDF</button>-->
+    <!--<button type="submit">Submit</button>-->
+    <div id="fileName"></div>
+
+    <form id="submitForm" style="margin-top: 20px;">
+        <button type="submit">Submit</button>
+    </form>
+
+    <button onclick="downloadSpreadsheet()" id = "downloadInvoice">Download Spreadsheet</button>
+
+</div>
+
+<div id="order-info"></div>
+
+<div>
+    <button onClick="splitWithAll()">Split with All</button>
+</div>
+</body>
+</html>
